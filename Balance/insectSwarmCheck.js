@@ -49,9 +49,18 @@ getComponent = () => {
         const combatTime = endTime-startTime;
 
         let insectSwarmSumTime = 0;
-        length = insectSwarmApplyRes.length;
+        applyLength = insectSwarmApplyRes.length;
+        removeLength = insectSwarmRemoveRes.length;
 
-        for (i=0;i<length;i++){
+        if(applyLength > removeLength){
+            insectSwarmRemoveRes[applyLength - 1] = {
+                timestamp : endTime,
+            };
+
+        }
+
+
+        for (i=0;i<applyLength;i++){
 
             insectSwarmSumTime = insectSwarmSumTime + (insectSwarmRemoveRes[i].timestamp-insectSwarmApplyRes[i].timestamp);
         }

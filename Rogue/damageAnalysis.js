@@ -1,4 +1,7 @@
 getComponent = () => {
+
+  const tottId = 57933;
+  const snapId = 99999;
   const damageConfig = [
     {
       bossName: "Razorscale",
@@ -189,7 +192,7 @@ getComponent = () => {
     },
   ];
 
-  //获取盗贼队员
+  //获取队员
   const actorRes = reportGroup.actors;
   const roguePlayerRes = actorRes.flatMap(actor => actor.subType === "Rogue" ? actor : []);
   for (let k of damageConfig) {
@@ -199,7 +202,6 @@ getComponent = () => {
     }
   }
 
-  // return damageConfig;
   const fightsRes = reportGroup.fights;
 
   //遍历Config数组,搜索战斗
@@ -211,23 +213,168 @@ getComponent = () => {
     }
   }
 
-  //获取每场战斗的伤害事件
+
+
   for (let k of damageConfig) {
+
+    //获取嫁祸buffApply事件数组
+
+    const tottEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'friendly').flatMap(event => (event.ability.id === tottId) && (event.target.subType === "Warlock") && (event.type === "applybuff")? event : []);
+    const endTime = fightsRes[k.fightId].endTime;
+    if(tottEventRes != null){
+      var tottRes = [];
+      for (let j of  tottEventRes){
+
+        tottEvent = {
+          'timestamp' : j.timestamp,
+          'targetname' : j.target.name,
+          'targetid' : j.target.gameId
+        };
+
+        tottRes.push(tottEvent);
+      }
+    }
+
+    // return tottRes;
+
+
+    //获取快照技能生效时间段数组
+    const snapEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'enemy').flatMap(event => (event.ability.id === snapId) && (event.target.gameId === k.targetId)? event : []);
+
+    // return snapEventRes;
+    if (snapEventRes.length > 0){
+      var snapApplyRes = [];
+      for (let j of snapEventRes){
+        for (let m of tottRes){
+          if (j.timestamp > m.timestamp && j.timestamp < m.timestamp + 6000 && j.source.gameId === m.targetid && (j.type === "applydebuff" || j.type === "refreshdebuff")){
+            snapApplyRes.push(j);
+          }
+
+        }
+      }
+
+      // return snapApplyRes;
+      var snapRes = [];
+      for (let j of snapApplyRes){
+        snapEvent = {
+          'starttime' : j.timestamp,
+          'endtime' : endTime,
+          'targetname' : j.target.name,
+          'targetid' : j.target.gameId,
+          'sourceid' : j.source.gameId,
+          'sourcename' : j.source.name
+        };
+        for (let m of snapEventRes){
+          if(m.source.gameId === j.source.gameId && m.type === "removedebuff" && m.timestamp > j.timestamp){
+            snapEvent = {
+              'starttime' : j.timestamp,
+              'endtime' : m.timestamp,
+              'targetname' : j.target.name,
+              'targetid' : j.target.gameId,
+              'sourceid' : j.source.gameId,
+              'sourcename' : j.source.name
+            };
+
+          }
+        }
+
+        snapRes.push(snapEvent);
+      }
+    }
+
+
+
+
+    // return  snapRes;
+
+    //获取伤害事件
     const eventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('damage', 'friendly');
+
 
     for (let j of eventRes) {
 
       if (k.phrase === null) {
-        if (j.target.gameId === k.targetId) {
-          key = Object(j.source.name);
-          k[key] = k[key] + j.amount;
 
+
+        if (j.target.gameId === k.targetId) {
+          if (j.source.type === 'Pet') {
+            key = Object(j.source.petOwner.name)
+            k[key] = k[key] + j.amount;
+          }
+          if (j.source.type === "Player") {
+            //快照技能类型计算
+            if(j.ability.id === snapId){
+              let tottC = 1;
+              if(snapRes.length > 0){
+                for (let m of snapRes) {
+                  // return m;
+                  if (j.timestamp > m.starttime && j.timestamp < m.endtime && j.source.gameId === m.sourceid) {
+
+                    tottC = 1.15
+                  }
+                }
+              }
+
+              key = Object(j.source.name);
+              k[key] = k[key] + Math.round(j.amount / tottC);
+            }else{
+              //普通技能类型计算
+              let tottC = 1;
+              if(tottRes.length > 0){
+                for (let m of tottRes) {
+                  // return m;
+                  if (j.timestamp > m.timestamp && j.timestamp < (m.timestamp + 6000) && j.source.gameId === m.targetid) {
+                    tottC = 1.15
+                  }
+                }
+              }
+
+              key = Object(j.source.name);
+              k[key] = k[key] + Math.round(j.amount / tottC);
+            }
+
+          }
         }
       } else if (k.phrase != null) {
         if (j.target.gameId === k.targetId && fightsRes[k.fightId].phaseForEvent(j) === k.phrase) {
-          key = Object(j.source.name);
-          k[key] = k[key] + j.amount;
 
+          if (j.source.type === 'Pet') {
+            key = Object(j.source.petOwner.name)
+            k[key] = k[key] + j.amount;
+          }
+          if (j.source.type === "Player") {
+            //快照技能类型计算
+            if(j.ability.id === snapId){
+              let tottC = 1;
+              if(snapRes.length > 0){
+                for (let m of snapRes) {
+                  // return m;
+                  if (j.timestamp > m.starttime && j.timestamp < m.endtime && j.source.gameId === m.sourceid) {
+
+                    tottC = 1.15
+                  }
+                }
+              }
+
+              key = Object(j.source.name);
+              k[key] = k[key] + Math.round(j.amount / tottC);
+            }else{
+              //普通技能类型计算
+              let tottC = 1;
+              if(tottRes.length > 0){
+                for (let m of tottRes) {
+                  // return m;
+                  if (j.timestamp > m.timestamp && j.timestamp < (m.timestamp + 6000) && j.source.gameId === m.targetid) {
+                    tottC = 1.15
+                  }
+                }
+              }
+
+              key = Object(j.source.name);
+              k[key] = k[key] + Math.round(j.amount / tottC);
+            }
+
+          }
         }
       }
 
@@ -236,6 +383,8 @@ getComponent = () => {
 
 
   }
+
   return damageConfig;
+
 
 }
