@@ -207,13 +207,17 @@ getComponent = () => {
 
     //获取队员
     const actorRes = reportGroup.actors;
-    const roguePlayerRes = actorRes.flatMap(actor => actor.subType === "Warlock" ? actor : []);
+
+    const playerRes = actorRes.flatMap(actor => actor.subType === "Warlock" && actor.type === "Player" ? actor : []);
+
     for (let k of damageConfig) {
-        for (let j of roguePlayerRes) {
+        for (let j of playerRes) {
             key = Object(j.name);
             k[key] = 0;
         }
     }
+
+
 
     const fightsRes = reportGroup.fights;
 
@@ -225,7 +229,7 @@ getComponent = () => {
             }
         }
     }
-
+    // return damageConfig;
 
 
     for (let k of damageConfig) {
@@ -311,11 +315,13 @@ getComponent = () => {
 
                 if (j.target.gameId === k.targetId) {
                     if (j.source.type === 'Pet') {
+
                         key = Object(j.source.petOwner.name)
                         k[key] = k[key] + j.amount;
                     }
                     if (j.source.type === "Player") {
                         //快照技能类型计算
+
                         if(j.ability.id === snapId){
                             let tottC = 1;
                             if(snapRes.length > 0){

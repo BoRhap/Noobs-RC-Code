@@ -155,7 +155,7 @@ getComponent = () => {
       phrase: 6,
     },
     {
-      bossName: "Mimiron => VX-001",
+      bossName: "Mimiron => VX-001 P4",
       encounterId: 754,
       targetId: 33651,
       phrase: 6,
@@ -194,13 +194,17 @@ getComponent = () => {
 
   //获取队员
   const actorRes = reportGroup.actors;
-  const roguePlayerRes = actorRes.flatMap(actor => actor.subType === "Rogue" ? actor : []);
+
+  const playerRes = actorRes.flatMap(actor => actor.subType === "Rogue" && actor.type === "Player" ? actor : []);
+
   for (let k of damageConfig) {
-    for (let j of roguePlayerRes) {
+    for (let j of playerRes) {
       key = Object(j.name);
       k[key] = 0;
     }
   }
+
+
 
   const fightsRes = reportGroup.fights;
 
@@ -212,16 +216,16 @@ getComponent = () => {
       }
     }
   }
-
+  // return damageConfig;
 
 
   for (let k of damageConfig) {
 
     //获取嫁祸buffApply事件数组
 
-    const tottEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'friendly').flatMap(event => (event.ability.id === tottId) && (event.target.subType === "Warlock") && (event.type === "applybuff")? event : []);
+    const tottEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'friendly').flatMap(event => (event.ability.id === tottId) && (event.target.subType === "Rogue") && (event.type === "applybuff")? event : []);
     const endTime = fightsRes[k.fightId].endTime;
-    if(tottEventRes != null){
+    if((tottEventRes != null)){
       var tottRes = [];
       for (let j of  tottEventRes){
 
@@ -298,11 +302,13 @@ getComponent = () => {
 
         if (j.target.gameId === k.targetId) {
           if (j.source.type === 'Pet') {
+
             key = Object(j.source.petOwner.name)
             k[key] = k[key] + j.amount;
           }
           if (j.source.type === "Player") {
             //快照技能类型计算
+
             if(j.ability.id === snapId){
               let tottC = 1;
               if(snapRes.length > 0){
