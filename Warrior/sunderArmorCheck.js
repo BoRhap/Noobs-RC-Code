@@ -79,9 +79,11 @@ getComponent = () => {
             sunderArmorSumTime = sunderArmorSumTime + (sunderArmorRemoveRes[i].timestamp-sunderArmorApplyRes[i].timestamp);
         }
         let sunderArmorPercent = ((sunderArmorSumTime/combatTime)*100).toFixed(2);
-        key = Object(sunderArmorApplyRes[0].source.name);
-        k[key] = {
-            coverage: sunderArmorPercent,
+        if (sunderArmorApplyRes.length>0){
+            key = Object(sunderArmorApplyRes[0].source.name);
+            k[key] = {
+                coverage: sunderArmorPercent,
+            }
         }
     }
 
@@ -117,7 +119,9 @@ getComponent = () => {
             for (i=0;i<5;i++) {
                 tmpFistFiveCasts[i]=w.fistFiveCasts[i];
             }
-            k[w.name]["first 5 casts"]=tmpFistFiveCasts;
+            if (w.castCount>0){
+                k[w.name]["first 5 casts"]=tmpFistFiveCasts;
+            }
         }
     }
     return sunderArmorConfig;
