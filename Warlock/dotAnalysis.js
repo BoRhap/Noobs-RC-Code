@@ -9,11 +9,11 @@ getComponent = () => {
     const fadeCheckAbilityArr = [hauntId,corruptionId,sbId]
     const debuffAbilityArr = [uaId,hauntId,corruptionId,agonyId,sbId]
     const debuffAbilityArrWithName = [
-        {abilityId:uaId,abilityName:"ua"},
-        {abilityId:hauntId,abilityName:"haunt"},
-        {abilityId:corruptionId,abilityName:"corruption"},
-        {abilityId:agonyId,abilityName:"agony"},
-        {abilityId:sbId,abilityName:"sb"},
+        {abilityId:uaId,abilityName:"ua",abilityCnName:"痛苦无常"},
+        {abilityId:hauntId,abilityName:"haunt",abilityCnName:"鬼影缠身"},
+        {abilityId:corruptionId,abilityName:"corruption",abilityCnName:"腐蚀术"},
+        {abilityId:agonyId,abilityName:"agony",abilityCnName:"痛苦诅咒"},
+        {abilityId:sbId,abilityName:"sb",abilityCnName:"暗影之拥"},
       ]
     const  dotConfig = [
         {
@@ -37,13 +37,7 @@ getComponent = () => {
             phrase: null,
             maxHitPoints : 24000000,
         },
-        {
-            bossName: "XT-002 Deconstructor => Heart of the Deconstructor",
-            encounterId: 747,
-            targetId: 33329,
-            phrase: null,
-            maxHitPoints : 1,
-        },
+
         {
             bossName: "Algalon the Observer",
             encounterId: 757,
@@ -100,13 +94,7 @@ getComponent = () => {
             phrase: null,
             maxHitPoints : 1,
         },
-        {
-            bossName: "Hodir",
-            encounterId: 751,
-            targetId: 32845,
-            phrase: null,
-            maxHitPoints : 1,
-        },
+
         {
             bossName: "Thorim",
             encounterId: 752,
@@ -114,49 +102,7 @@ getComponent = () => {
             phrase: null,
             maxHitPoints : 1,
         },
-        {
-            bossName: "Freya => Ancient Conservator",
-            encounterId: 753,
-            targetId: 33203,
-            phrase: 1,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Freya => Ancient Water Spirit",
-            encounterId: 753,
-            targetId: 33202,
-            phrase: 1,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Freya => Snaplasher",
-            encounterId: 753,
-            targetId: 32916,
-            phrase: 1,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Freya => Storm Lasher",
-            encounterId: 753,
-            targetId: 32919,
-            phrase: 1,
-            maxHitPoints : 1,
-        },
 
-        {
-            bossName: "Freya P1",
-            encounterId: 753,
-            targetId: 32906,
-            phrase: 1,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Freya P2",
-            encounterId: 753,
-            targetId: 32906,
-            phrase: 2,
-            maxHitPoints : 1,
-        },
 
         {
             bossName: "Mimiron => Leviathan Mk II P1",
@@ -172,48 +118,7 @@ getComponent = () => {
             phrase: 3,
             maxHitPoints : 1,
         },
-        {
-            bossName: "Mimiron => Assault Bot P3",
-            encounterId: 754,
-            targetId: 34057,
-            phrase: 5,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Mimiron => Aerial Command Unit P3",
-            encounterId: 754,
-            targetId: 33670,
-            phrase: 5,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Mimiron => Leviathan Mk II P4",
-            encounterId: 754,
-            targetId: 33432,
-            phrase: 6,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Mimiron => VX-001 P4",
-            encounterId: 754,
-            targetId: 33651,
-            phrase: 6,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "Mimiron => Aerial Command Unit P4",
-            encounterId: 754,
-            targetId: 33670,
-            phrase: 6,
-            maxHitPoints : 1,
-        },
-        {
-            bossName: "General Vezax => Saronite Animus",
-            encounterId: 755,
-            targetId: 33524,
-            phrase: null,
-            maxHitPoints : 1,
-        },
+
 
         {
             bossName: "Yogg-Saron",
@@ -250,6 +155,24 @@ getComponent = () => {
         }
     }
 
+    //构造数据结构
+
+    for(let k of dotConfig){
+        for (let j of playerRes){
+
+            for (let m of debuffAbilityArrWithName){
+                key = Object(j.name) +"-" + Object(m.abilityName)+"-clipped"
+                k[key] = 0;
+                key = Object(j.name) +"-" + Object(m.abilityName)+"-fade"
+                k[key] = 0;
+                key = Object(j.name) +"-" + Object(m.abilityName)+"-uptime"
+                k[key] = 0;
+                key = Object(j.name) +"-" + Object(m.abilityName)+"-avgApply"
+                k[key] = 0;
+            }
+        }
+    }
+
     // return dotConfig;
 
     for (let k of dotConfig) {
@@ -261,7 +184,8 @@ getComponent = () => {
         if(k.phrase === null){
             //不需要区分阶段的BOSS时间分段获取
             for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.99) && (j.targetResources.maxHitPoints > k.maxHitPoints)) {
                         k["startTimeStamp"] = j.timestamp;
                         break;
@@ -269,23 +193,23 @@ getComponent = () => {
                 }
             }
             for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.35)&& (j.targetResources.maxHitPoints > k.maxHitPoints)) {
                         k["thirtyFiveTimeStamp"] = j.timestamp;
                         break;
                     }
                 }
             }
-            for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+            for (let j of damageEventRes ) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.25)&& (j.targetResources.maxHitPoints > k.maxHitPoints)) {
                         k["twentyFiveTimeStamp"] = j.timestamp;
                         break;
                     }
                 }
             }
-            for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+            for (let j of damageEventRes ) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.01)&& (j.targetResources.maxHitPoints > k.maxHitPoints)) {
                         k["endTimeStamp"] = j.timestamp;
                         break;
@@ -303,7 +227,7 @@ getComponent = () => {
         }else{
             //需要区分阶段的BOSS时间分段获取
             for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.99)&& (j.targetResources.maxHitPoints > k.maxHitPoints)&& (k.phrase === fightsRes[k.fightId].phaseForEvent(j))) {
                         k["startTimeStamp"] = j.timestamp;
                         break;
@@ -311,7 +235,7 @@ getComponent = () => {
                 }
             }
             for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.35)&& (j.targetResources.maxHitPoints > k.maxHitPoints)&& (k.phrase === fightsRes[k.fightId].phaseForEvent(j))) {
                         k["thirtyFiveTimeStamp"] = j.timestamp;
                         break;
@@ -319,7 +243,7 @@ getComponent = () => {
                 }
             }
             for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.25)&& (j.targetResources.maxHitPoints > k.maxHitPoints)&& (k.phrase === fightsRes[k.fightId].phaseForEvent(j))) {
                         k["twentyFiveTimeStamp"] = j.timestamp;
                         break;
@@ -327,7 +251,7 @@ getComponent = () => {
                 }
             }
             for (let j of damageEventRes) {
-                if (j.targetResources != null) {
+                if (j.targetResources != null && j.timestamp != undefined) {
                     if ((j.targetResources.hitPoints / j.targetResources.maxHitPoints < 0.01)&& (j.targetResources.maxHitPoints > k.maxHitPoints)&& (k.phrase === fightsRes[k.fightId].phaseForEvent(j))) {
                         k["endTimeStamp"] = j.timestamp;
                         break;
@@ -342,16 +266,19 @@ getComponent = () => {
             }
         }
 
-        const debuffEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'enemy').flatMap(event => (debuffAbilityArr.includes(event.ability.id)) && (event.target.gameId === k.targetId)? event : []);
+        const debuffEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'enemy').flatMap(event => (debuffAbilityArr.includes(event.ability.id)) && (event.target.gameId === k.targetId) ? event : []);
 
         // return debuffEventRes;
 
         for (let j of debuffEventRes){
+
             //判断100-0鬼影、腐蚀、暗影之拥断的次数
 
             if(fadeCheckAbilityArr.includes(j.ability.id) && j.timestamp < (k.endTimeStamp-1000) && j.timestamp > k.startTimeStamp && j.type === "removedebuff" ){
 
-                key = Object(j.source.name) +"-" + Object(j.ability.name)+"-fade"
+                abilityName = debuffAbilityArrWithName.find(item => item.abilityId === j.ability.id).abilityName;
+
+                key = Object(j.source.name) +"-" + abilityName +"-fade"
                 if(k[key] == null){
 
                     k[key] = 0;
@@ -361,7 +288,8 @@ getComponent = () => {
             //判断100-0痛苦无常、痛苦诅咒吞DEBUFF的次数
             if(clippedCheckAbilityArr.includes(j.ability.id) && j.timestamp < (k.endTimeStamp-1000) && j.timestamp > k.startTimeStamp && j.type === "refreshdebuff" ){
 
-                key = Object(j.source.name) +"-" + Object(j.ability.name)+"-clipped"
+                abilityName = debuffAbilityArrWithName.find(item => item.abilityId === j.ability.id).abilityName;
+                key = Object(j.source.name) +"-" + abilityName +"-clipped"
                 if(k[key] == null){
 
                     k[key] = 0;
@@ -399,6 +327,7 @@ getComponent = () => {
                     };
                     removeEventRes.push(removeEvent);
                 }
+
                 if(applyEventRes[0].timestamp > removeEventRes[0].timestamp){
                     applyEvent = {
                         timestamp:k.startTimeStamp
@@ -416,7 +345,7 @@ getComponent = () => {
                 for (i=0;i<applyEventRes.length;i++){
 
 
-                    sumTime = sumTime + (removeEventRes[i].timestamp-applyEventRes[i].timestamp);
+                    sumTime = sumTime + (removeEventRes[i]?.timestamp-applyEventRes[i]?.timestamp);
                 }
                 if(k.twentyFiveTimeStamp !== k.startTimeStamp){
 
@@ -436,12 +365,13 @@ getComponent = () => {
             }
         }
         //计算鬼影applydebuff间隔
-        //foreach 术士
+        // foreach 术士
         for(let j of playerRes){
             const hauntEventRes = fightsRes[k.fightId].eventsByCategoryAndDisposition('aurasGained', 'enemy').flatMap(event =>(event.source.gameId === j.gameId) &&(event.ability.id === hauntId) && (event.target.gameId === k.targetId) && ((event.type === 'applydebuff') || (event.type === 'refreshdebuff'))? event : [])
             if(hauntEventRes.length>1){
                 let avgApply = 0;
                 for(i=0;i<hauntEventRes.length-1;i++){
+
                     avgApply = avgApply+(hauntEventRes[i+1].timestamp-hauntEventRes[i].timestamp);
 
                 }

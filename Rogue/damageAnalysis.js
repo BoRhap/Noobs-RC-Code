@@ -172,12 +172,12 @@ getComponent = () => {
       targetId: 33136,
       phrase: 1,
     },
-    {
-      bossName: "Yogg-Saron => Brain of Yogg-Saron",
-      encounterId: 756,
-      targetId: 33890,
-      phrase: 2,
-    },
+    // {
+    //   bossName: "Yogg-Saron => Brain of Yogg-Saron",
+    //   encounterId: 756,
+    //   targetId: 33890,
+    //   phrase: 2,
+    // },
     {
       bossName: "Yogg-Saron => Immortal Guardian",
       encounterId: 756,
