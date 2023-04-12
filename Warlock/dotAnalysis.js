@@ -161,17 +161,30 @@ getComponent = () => {
 
     for(let k of dotConfig){
         for (let j of playerRes){
-            if(eventFilters.actorId === 0 || eventFilters.actorId === j.id)
-            for (let m of debuffAbilityArrWithName){
-                key = Object(j.name) +"-" + Object(m.abilityName)+"-clipped"
-                k[key] = 0;
-                key = Object(j.name) +"-" + Object(m.abilityName)+"-fade"
-                k[key] = 0;
-                key = Object(j.name) +"-" + Object(m.abilityName)+"-uptime"
-                k[key] = 0;
-                key = Object(j.name) +"-" + Object(m.abilityName)+"-avgApply"
-                k[key] = 0;
+            if(eventFilters.actorId === 0 || eventFilters.actorId === j.id){
+                k[Object(j.name) +"-" + "ua"+"-clipped"] = 0;
+                k[Object(j.name) +"-" + "agony"+"-clipped"] = 0;
+                k[Object(j.name) +"-" + "haunt"+"-fade"] = 0;
+                k[Object(j.name) +"-" + "corruption"+"-fade"] = 0;
+                k[Object(j.name) +"-" + "sb"+"-fade"] = 0;
+                k[Object(j.name) +"-" + "ua"+"-uptime"] = 0;
+                k[Object(j.name) +"-" + "haunt"+"-uptime"] = 0;
+                k[Object(j.name) +"-" + "corruption"+"-uptime"] = 0;
+                k[Object(j.name) +"-" + "agony"+"-uptime"] = 0;
+                k[Object(j.name) +"-" + "sb"+"-uptime"] = 0;
+                k[Object(j.name) +"-" + "haunt"+"-avgApply"] = 0;
+
             }
+            // for (let m of debuffAbilityArrWithName){
+            //     key = Object(j.name) +"-" + Object(m.abilityName)+"-clipped"
+            //     k[key] = 0;
+            //     key = Object(j.name) +"-" + Object(m.abilityName)+"-fade"
+            //     k[key] = 0;
+            //     key = Object(j.name) +"-" + Object(m.abilityName)+"-uptime"
+            //     k[key] = 0;
+            //     key = Object(j.name) +"-" + Object(m.abilityName)+"-avgApply"
+            //     k[key] = 0;
+            // }
         }
     }
 
