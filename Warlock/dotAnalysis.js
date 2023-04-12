@@ -157,9 +157,11 @@ getComponent = () => {
 
     //构造数据结构
 
+    // return eventFilters
+
     for(let k of dotConfig){
         for (let j of playerRes){
-
+            if(eventFilters.actorId === 0 || eventFilters.actorId === j.id)
             for (let m of debuffAbilityArrWithName){
                 key = Object(j.name) +"-" + Object(m.abilityName)+"-clipped"
                 k[key] = 0;
